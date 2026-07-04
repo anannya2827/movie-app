@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Film Archive</title>
+    <!-- Warm vintage serif font and classic clean subtitle font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="archive-container">
+        <header>
+            <h1 class="archive-title">The Film Archive</h1>
+            <p class="subtitle">Search the global open movie database</p>
+        </header>
+
+        <form id="search-form" class="search-box">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Search by title (e.g., The Godfather)..." 
+                autocomplete="off" 
+                required
+            >
+            <button type="submit" id="search-btn">Search</button>
+        </form>
+
+        <div id="status-message"></div>
+
+        <main id="movie-grid" class="grid-container"></main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
