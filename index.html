@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vintage Film Archive</title>
+    <title>The Film Archive</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -18,23 +18,28 @@
         </header>
 
         <form id="search-form" class="search-box">
-           <input type="text" id="search-input" placeholder="Search heroes & masterpieces (e.g., Spiderman, Superman, Wonder Woman)...">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Search by title (e.g., Star Wars)..." 
+                autocomplete="off" 
+                required
+            >
             <button type="submit" id="search-btn">Search</button>
         </form>
 
         <div id="status-message"></div>
 
-
-        <h2 id="section-title" class="section-heading">Trending Collection</h2>
+        <!-- Movie Results Grid -->
         <main id="movie-grid" class="grid-container"></main>
     </div>
 
-    <!-- MOVIE DETAILS MODAL COMPONENT -->
-    <div id="movie-modal" class="modal-backdrop hidden">
+    <!-- MOVIE DETAILS MODAL (Acting as the Details Page) -->
+    <div id="details-modal" class="modal hidden">
         <div class="modal-content">
-            <button id="close-modal" class="close-btn">&times;</button>
+            <button id="close-modal" class="close-btn">&times; Close</button>
             <div id="modal-body">
-                <!-- Injected dynamically by JavaScript -->
+                <!-- Dynamically injected via JavaScript -->
             </div>
         </div>
     </div>
