@@ -18,23 +18,36 @@ body {
     margin: 0 auto;
 }
 
-/* Elegant Typography */
-header {
-    text-align: center;
+/* Elegant Left-Aligned Header Typography */
+.main-header {
+    text-align: left; /* Aligns brand cleanly to the left */
     margin-bottom: 40px;
+    border-bottom: 1px solid #2a251f;
+    padding-bottom: 15px;
+}
+
+.archive-title-link {
+    text-decoration: none; /* Removes the default hyperlink line */
+    display: inline-block;
 }
 
 .archive-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: #f4efe6;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+/* Subtle accent feedback when hovering over the home link logo */
+.archive-title-link:hover .archive-title {
+    color: #a09a90;
 }
 
 .subtitle {
-    font-size: 1rem;
-    color: #a09a90;
+    font-size: 0.85rem;
+    color: #666056;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -214,7 +227,6 @@ header {
     color: white;
 }
 
-/* Details Layout Grid */
 .details-layout {
     display: grid;
     grid-template-columns: 200px 1fr;
@@ -255,8 +267,9 @@ header {
     font-weight: 600;
 }
 
-/* Responsive Scaling */
+/* Responsive Grid Adjustments */
 @media(max-width: 600px) {
+    .main-header { text-align: center; }
     .archive-title { font-size: 2.2rem; }
     .search-box { flex-direction: column; border: none; background: transparent; }
     .search-box input { border: 1px solid #3a352e; margin-bottom: 8px; background: #1a1a1a; border-radius: 4px; }
