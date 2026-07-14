@@ -2,6 +2,7 @@ const API_KEY = '39321ba3';
 const BASE_URL = `https://www.omdbapi.com/?apikey=${API_KEY}&`;
 
 // DOM Elements
+const homeLogo = document.getElementById('home-logo');
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
 const movieGrid = document.getElementById('movie-grid');
@@ -11,15 +12,26 @@ const detailsModal = document.getElementById('details-modal');
 const closeModalBtn = document.getElementById('close-modal');
 const modalBody = document.getElementById('modal-body');
 
-// --- DYNAMIC HOME POPULATION ---
-// Automatically triggers on load to pull fresh thematic matching datasets dynamically
-document.addEventListener('DOMContentLoaded', () => {
-    const initialQueries = ['Space', 'Vintage', 'Noir', 'Classic', 'Adventure'];
+// Base dynamic search array parameters
+const initialQueries = ['Space', 'Vintage', 'Noir', 'Classic', 'Adventure'];
+
+// --- ROUTINE LOGIC INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', loadDefaultHome);
+
+// --- RETURN HOME RESET CONTROLLER ---
+function loadDefaultHome() {
+    searchInput.value = ''; // Clean the search field empty
     const randomDefault = initialQueries[Math.floor(Math.random() * initialQueries.length)];
     fetchMovies(randomDefault);
+}
+
+// Event hook for the top-left Title Logo to return home
+homeLogo.addEventListener('click', (e) => {
+    e.preventDefault(); // Stop standard hash jumping
+    loadDefaultHome();
 });
 
-// Search functionality
+// Search Action Submission
 searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const searchTerms = searchInput.value.trim();
@@ -56,8 +68,6 @@ function displayResults(movies) {
     movies.forEach(movie => {
         const movieCard = document.createElement('div');
         movieCard.classList.add('movie-card');
-        
-        // Save the unique IMDb ID to the element's dataset for the details view lookup
         movieCard.dataset.imdbId = movie.imdbID;
 
         const posterHTML = movie.Poster !== "N/A" 
@@ -77,7 +87,6 @@ function displayResults(movies) {
             </div>
         `;
 
-        // Click Event: Open Detailed view
         movieCard.addEventListener('click', () => {
             fetchMovieDetails(movie.imdbID);
         });
@@ -86,10 +95,9 @@ function displayResults(movies) {
     });
 }
 
-// --- DYNAMIC DETAILS VIEW CONTROLLER ---
+// Fetch Detailed data records
 async function fetchMovieDetails(imdbId) {
     try {
-        // Query by specific IMDb ID ('i=') to get full structural detail records
         const response = await fetch(`${BASE_URL}i=${imdbId}&plot=full`);
         if (!response.ok) throw new Error('Details lookup failed.');
 
@@ -128,20 +136,18 @@ function renderModalContent(movie) {
     `;
 }
 
-// Modal Toggle Handlers
 function openModal() {
     detailsModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden'; // Stop background scrolling
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
     detailsModal.classList.add('hidden');
-    document.body.style.overflow = 'auto'; // Re-enable background scrolling
+    document.body.style.overflow = 'auto';
 }
 
 closeModalBtn.addEventListener('click', closeModal);
 
-// Close modal if user clicks outside the modal box container frame
 window.addEventListener('click', (e) => {
     if (e.target === detailsModal) {
         closeModal();
