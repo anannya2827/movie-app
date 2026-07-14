@@ -12,8 +12,11 @@
 <body>
 
     <div class="archive-container">
-        <header>
-            <h1 class="archive-title">The Film Archive</h1>
+        <!-- Header area modified for branding on the top left -->
+        <header class="main-header">
+            <a href="#" id="home-logo" class="archive-title-link">
+                <h1 class="archive-title">The Film Archive</h1>
+            </a>
             <p class="subtitle">Search the global open movie database</p>
         </header>
 
@@ -34,7 +37,7 @@
         <main id="movie-grid" class="grid-container"></main>
     </div>
 
-    <!-- MOVIE DETAILS MODAL (Acting as the Details Page) -->
+    <!-- MOVIE DETAILS MODAL -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
             <button id="close-modal" class="close-btn">&times; Close</button>
