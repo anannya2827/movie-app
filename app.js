@@ -1,41 +1,35 @@
 const API_KEY = '39321ba3'; 
 const BASE_URL = `https://www.omdbapi.com/?apikey=${API_KEY}&`;
 
-// --- DOM ELEMENT REFERENCES ---
+// DOM Elements
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
 const movieGrid = document.getElementById('movie-grid');
-const sectionTitle = document.getElementById('section-title');
 const statusMessage = document.getElementById('status-message');
 
-// Modal Elements
-const movieModal = document.getElementById('movie-modal');
-const closeModal = document.getElementById('close-modal');
+const detailsModal = document.getElementById('details-modal');
+const closeModalBtn = document.getElementById('close-modal');
 const modalBody = document.getElementById('modal-body');
 
-// --- APP INITIALIZER (DEFAULT VALUE CALL) ---
+// --- DYNAMIC HOME POPULATION ---
+// Automatically triggers on load to pull fresh thematic matching datasets dynamically
 document.addEventListener('DOMContentLoaded', () => {
-    // Dynamically populate trending content on load so it's never hardcoded blank
-    fetchMovies('Space', true); 
+    const initialQueries = ['Space', 'Vintage', 'Noir', 'Classic', 'Adventure'];
+    const randomDefault = initialQueries[Math.floor(Math.random() * initialQueries.length)];
+    fetchMovies(randomDefault);
 });
 
-// --- EVENT ROUTING ---
+// Search functionality
 searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const searchTerms = searchInput.value.trim();
     if (searchTerms) {
-        fetchMovies(searchTerms, false);
+        fetchMovies(searchTerms);
     }
 });
 
-// Close modal triggers
-closeModal.addEventListener('click', () => movieModal.classList.add('hidden'));
-movieModal.addEventListener('click', (e) => {
-    if (e.target === movieModal) movieModal.classList.add('hidden');
-});
-
-// --- CORE ASYNC API FETCH ACTION ---
-async function fetchMovies(query, isTrending = false) {
+// Fetch search collection results
+async function fetchMovies(query) {
     try {
         statusMessage.textContent = 'Searching archive library...';
         movieGrid.innerHTML = ''; 
@@ -47,8 +41,6 @@ async function fetchMovies(query, isTrending = false) {
 
         if (data.Response === "True") {
             statusMessage.textContent = '';
-            // Dynamically alter header title safely
-            sectionTitle.textContent = isTrending ? 'Trending Archive Collection' : `Search Results for "${query}"`;
             displayResults(data.Search);
         } else {
             statusMessage.textContent = `No results found for "${query}".`;
@@ -59,14 +51,14 @@ async function fetchMovies(query, isTrending = false) {
     }
 }
 
-// --- RENDERING LAYER GRID ENGINE ---
+// Display search listing cards
 function displayResults(movies) {
     movies.forEach(movie => {
         const movieCard = document.createElement('div');
         movieCard.classList.add('movie-card');
         
-        // Stash the imdbID on the element container dataset safely
-        movieCard.dataset.id = movie.imdbID;
+        // Save the unique IMDb ID to the element's dataset for the details view lookup
+        movieCard.dataset.imdbId = movie.imdbID;
 
         const posterHTML = movie.Poster !== "N/A" 
             ? `<img src="${movie.Poster}" alt="${movie.Title}">`
@@ -85,7 +77,7 @@ function displayResults(movies) {
             </div>
         `;
 
-        // Click handler to load deep single item metadata specs
+        // Click Event: Open Detailed view
         movieCard.addEventListener('click', () => {
             fetchMovieDetails(movie.imdbID);
         });
@@ -94,44 +86,64 @@ function displayResults(movies) {
     });
 }
 
-// --- SPECIFIC ITEM SINGLE LOOKUP BY IMDB ID ---
-async function fetchMovieDetails(id) {
+// --- DYNAMIC DETAILS VIEW CONTROLLER ---
+async function fetchMovieDetails(imdbId) {
     try {
-        statusMessage.textContent = 'Loading cinematic file entries...';
-        
-        // Call via "i=" target path instead of search bundle array parameters
-        const response = await fetch(`${BASE_URL}i=${id}&plot=full`);
-        if (!response.ok) throw new Error('Failed to retrieve specific content details.');
+        // Query by specific IMDb ID ('i=') to get full structural detail records
+        const response = await fetch(`${BASE_URL}i=${imdbId}&plot=full`);
+        if (!response.ok) throw new Error('Details lookup failed.');
 
         const movie = await response.json();
-        statusMessage.textContent = '';
-
-        // Inject deep analytical detail metrics cleanly inside the view modal panel
-        modalBody.innerHTML = `
-            <div class="details-layout">
-                <img class="details-poster" src="${movie.Poster !== 'N/A' ? movie.Poster : ''}" alt="${movie.Title}" onerror="this.style.display='none'">
-                <div class="details-info">
-                    <h2 class="details-title">${movie.Title}</h2>
-                    <div class="details-meta-line">
-                        <span>Released: ${movie.Year}</span>
-                        <span>Rating: ${movie.imdbRating}/10</span>
-                        <span>Runtime: ${movie.Runtime}</span>
-                    </div>
-                    <p class="details-plot">${movie.Plot !== 'N/A' ? movie.Plot : 'No dynamic narrative plot descriptions filed.'}</p>
-                    <div class="details-crew">
-                        <p><strong>Director:</strong> ${movie.Director}</p>
-                        <p><strong>Cast Stars:</strong> ${movie.Actors}</p>
-                        <p><strong>Genre Tagging:</strong> ${movie.Genre}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Unveil view visibility
-        movieModal.classList.remove('hidden');
-
+        
+        if (movie.Response === "True") {
+            renderModalContent(movie);
+            openModal();
+        }
     } catch (error) {
-        console.error(error);
-        statusMessage.textContent = 'Failed to load movie details file.';
+        console.error("Error fetching movie details:", error);
     }
 }
+
+function renderModalContent(movie) {
+    const posterHTML = movie.Poster !== "N/A" 
+        ? `<img src="${movie.Poster}" alt="${movie.Title}">`
+        : `<div class="no-poster">No Image Available</div>`;
+
+    modalBody.innerHTML = `
+        <div class="details-layout">
+            <div class="details-poster">
+                ${posterHTML}
+            </div>
+            <div class="details-info">
+                <h2>${movie.Title}</h2>
+                <p><strong>Released:</strong> ${movie.Released} (${movie.Runtime})</p>
+                <p><strong>Genre:</strong> ${movie.Genre}</p>
+                <p><strong>IMDb Rating:</strong> <span class="rating-badge">★ ${movie.imdbRating}</span></p>
+                <p><strong>Director:</strong> ${movie.Director}</p>
+                <p><strong>Actors:</strong> ${movie.Actors}</p>
+                <hr style="border: 0; border-top: 1px solid #3a352e; margin: 15px 0;">
+                <p><strong>Plot Summary:</strong><br>${movie.Plot}</p>
+            </div>
+        </div>
+    `;
+}
+
+// Modal Toggle Handlers
+function openModal() {
+    detailsModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Stop background scrolling
+}
+
+function closeModal() {
+    detailsModal.classList.add('hidden');
+    document.body.style.overflow = 'auto'; // Re-enable background scrolling
+}
+
+closeModalBtn.addEventListener('click', closeModal);
+
+// Close modal if user clicks outside the modal box container frame
+window.addEventListener('click', (e) => {
+    if (e.target === detailsModal) {
+        closeModal();
+    }
+});
